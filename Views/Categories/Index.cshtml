@@ -1,0 +1,49 @@
+﻿@model IEnumerable<FinanceTracker.Models.Category>
+@{
+    ViewData["Title"] = "Управление категориями";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📂 Категории доходов и расходов</h2>
+        <a asp-action="Create" class="btn btn-success">+ Добавить категорию</a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название</th>
+                        <th>Тип</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>
+                                <span class="badge @(item.Type == FinanceTracker.Models.TransactionType.Income ? "bg-success" : "bg-danger")">
+                                    @(item.Type == FinanceTracker.Models.TransactionType.Income ? "Доход" : "Расход")
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Вы уверены? Если есть привязанные операции, удаление будет заблокировано.');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <a asp-controller="Transactions" asp-action="Index" class="btn btn-secondary mt-3">← Назад к операциям</a>
+</div>

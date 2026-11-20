@@ -1,0 +1,42 @@
+﻿@model FinanceTracker.Models.Category
+@{
+    ViewData["Title"] = "Добавить категорию";
+}
+
+<div class="container mt-4">
+    <h2>Добавить новую категорию</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Название категории</label>
+                    <input asp-for="Name" class="form-control" placeholder="Например: Стройка, Подарки" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Type" class="form-label">Тип операции</label>
+                    <select asp-for="Type" class="form-select">
+                        <option value="Income">Доход</option>
+                        <option value="Expense">Расход</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

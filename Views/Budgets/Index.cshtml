@@ -1,0 +1,138 @@
+﻿@model FinanceTracker.ViewModels.BudgetsIndexViewModel
+@{
+    ViewData["Title"] = "Бюджеты";
+    var monthName = new System.Globalization.CultureInfo("ru-RU")
+        .DateTimeFormat.GetMonthName(Model.Month);
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>💰 Бюджеты на @monthName @Model.Year</h2>
+        <div>
+            <a asp-action="Index" asp-route-year="@DateTime.Today.Year"
+               asp-route-month="@DateTime.Today.Month"
+               class="btn btn-outline-secondary">Текущий месяц</a>
+            <a asp-action="Create" asp-route-year="@Model.Year"
+               asp-route-month="@Model.Month"
+               class="btn btn-primary">+ Добавить бюджет</a>
+        </div>
+    </div>
+
+    <!-- Переключатель месяца -->
+    <form method="get" asp-action="Index" class="row g-2 mb-4 p-3 bg-light rounded">
+        <div class="col-md-3">
+            <label class="form-label">Месяц:</label>
+            <select name="month" class="form-select">
+                @for (var i = 1; i <= 12; i++)
+                {
+                    var name = new System.Globalization.CultureInfo("ru-RU")
+                    .DateTimeFormat.GetMonthName(i);
+                    <option value="@i" selected="@(i == Model.Month)">
+                        @name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Год:</label>
+            <input type="number" name="year" class="form-control"
+                   value="@Model.Year" min="2000" max="2100">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-outline-primary w-100">Перейти</button>
+        </div>
+    </form>
+
+    <!-- Сводка -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5>Общий лимит</h5>
+                    <h3>@Model.TotalLimit.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card @(Model.TotalSpent > Model.TotalLimit ? "bg-warning" : "bg-light")">
+                <div class="card-body">
+                    <h5>Израсходовано</h5>
+                    <h3>@Model.TotalSpent.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-info">
+            На этот месяц бюджеты ещё не заданы.
+            <a asp-action="Create" asp-route-year="@Model.Year"
+               asp-route-month="@Model.Month">Добавить первый бюджет</a>.
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model.Items)
+        {
+            <div class="card mb-3 @(item.IsOverBudget ? "border-danger" : "")">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">
+                            @item.CategoryName
+                            @if (item.IsOverBudget)
+                            {
+                                <span class="badge bg-danger ms-2">Перерасход!</span>
+                            }
+                            else if (item.Percent >= 80)
+                            {
+                                <span class="badge bg-warning text-dark ms-2">Близко к лимиту</span>
+                            }
+                        </h5>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@item.BudgetId"
+                               class="btn btn-sm btn-outline-secondary">Изменить</a>
+                            <form asp-action="Delete" asp-route-id="@item.BudgetId"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Удалить этот бюджет?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>
+                            <strong>@item.Spent.ToString("C")</strong>
+                            из @item.MonthlyLimit.ToString("C")
+                        </span>
+                        <span class="text-muted">@item.Percent%</span>
+                    </div>
+
+                    <div class="progress" style="height: 22px;">
+                        <div class="progress-bar @item.ProgressClass"
+                             role="progressbar"
+                             style="width: @(Math.Min(item.Percent, 100))%"
+                             aria-valuenow="@item.Percent"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            @item.Percent%
+                        </div>
+                    </div>
+
+                    <div class="mt-1 small text-muted">
+                        @if (item.IsOverBudget)
+                        {
+                            <span class="text-danger">
+                                Превышение на @((item.Spent - item.MonthlyLimit).ToString("C"))
+                            </span>
+                        }
+                        else
+                        {
+                            <span>Осталось: @item.Remaining.ToString("C")</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

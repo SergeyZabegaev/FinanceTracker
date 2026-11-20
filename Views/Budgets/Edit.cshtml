@@ -1,0 +1,67 @@
+﻿@model FinanceTracker.Models.Budget
+@{
+    ViewData["Title"] = "Редактировать бюджет";
+    var categories = (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.Categories;
+}
+
+<div class="container mt-4">
+    <h2>Редактировать бюджет</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="form-label"></label>
+                    <select asp-for="CategoryId" asp-items="categories" class="form-select">
+                        <option value="">— Выберите категорию —</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MonthlyLimit" class="form-label"></label>
+                    <input asp-for="MonthlyLimit" class="form-control" step="0.01" />
+                    <span asp-validation-for="MonthlyLimit" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Month" class="form-label"></label>
+                        <select asp-for="Month" class="form-select">
+                            @for (var i = 1; i <= 12; i++)
+                            {
+                                var name = new System.Globalization.CultureInfo("ru-RU")
+                                .DateTimeFormat.GetMonthName(i);
+                                <option value="@i" selected="@(i == Model.Month)">
+                                    @name
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="Month" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Year" class="form-label"></label>
+                        <input asp-for="Year" class="form-control" />
+                        <span asp-validation-for="Year" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    <a asp-action="Index" asp-route-year="@Model.Year"
+                       asp-route-month="@Model.Month"
+                       class="btn btn-secondary">Назад к бюджетам</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

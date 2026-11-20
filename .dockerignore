@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+financetracker.db
+financetracker.db-shm
+financetracker.db-wal
+data/
+.git/
+README.md

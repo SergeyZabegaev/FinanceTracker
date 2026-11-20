@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<!-- Герой-секция (Приветственный баннер) -->
+<div class="p-5 mb-4 bg-light rounded-3 text-center shadow-sm" style="background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);">
+    <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold text-dark">📊 FinanceTracker</h1>
+        <p class="col-md-8 fs-5 mx-auto text-secondary">
+            Ваш надежный помощник в управлении личными финансами.
+            Контролируйте доходы, планируйте бюджеты и визуализируйте свои финансовые цели в одном месте.
+        </p>
+        <a class="btn btn-primary btn-lg mt-2 shadow" asp-controller="Transactions" asp-action="Create">
+            ➕ Быстро добавить операцию
+        </a>
+    </div>
+</div>
+
+<!-- Основной контент: Сетка карточек -->
+<div class="container">
+    <h3 class="mb-4 text-center text-secondary">Возможности системы</h3>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+        <!-- Карточка 1: Операции -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                <div class="card-body text-center p-4">
+                    <div class="display-6 mb-3">💳</div>
+                    <h5 class="card-title fw-bold">Учёт операций</h5>
+                    <p class="card-text text-muted">Добавляйте, редактируйте и фильтруйте доходы и расходы с привязкой к категориям.</p>
+                    <a asp-controller="Transactions" asp-action="Index" class="btn btn-outline-primary w-100">Перейти к операциям</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Карточка 2: Категории -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                <div class="card-body text-center p-4">
+                    <div class="display-6 mb-3">📂</div>
+                    <h5 class="card-title fw-bold">Категории</h5>
+                    <p class="card-text text-muted">Управляйте справочником категорий. Создавайте новые под ваши специфические нужды.</p>
+                    <a asp-controller="Categories" asp-action="Index" class="btn btn-outline-success w-100">Управление категориями</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Карточка 3: Дашборды (НОВОЕ) -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                <div class="card-body text-center p-4">
+                    <div class="display-6 mb-3">📊</div>
+                    <h5 class="card-title fw-bold">Дашборды</h5>
+                    <p class="card-text text-muted">Наглядная визуализация расходов и доходов в виде графиков и диаграмм.</p>
+                    <a asp-controller="Dashboards" asp-action="Index" class="btn btn-outline-info w-100">Открыть дашборды</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Карточка 4: Бюджеты (НОВОЕ) -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                <div class="card-body text-center p-4">
+                    <div class="display-6 mb-3">🎯</div>
+                    <h5 class="card-title fw-bold">Бюджеты</h5>
+                    <p class="card-text text-muted">Устанавливайте лимиты расходов по категориям и следите за их соблюдением.</p>
+                    <a asp-controller="Budgets" asp-action="Index" class="btn btn-outline-warning w-100">Управление бюджетами</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Карточка 5: Аналитика и Отчёты -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                <div class="card-body text-center p-4">
+                    <div class="display-6 mb-3">📈</div>
+                    <h5 class="card-title fw-bold">Аналитика</h5>
+                    <p class="card-text text-muted">Смотрите сводный баланс, динамику изменений и статистику за любой период.</p>
+                    <a asp-controller="Transactions" asp-action="Index" class="btn btn-outline-secondary w-100">Смотреть отчёты</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Небольшой CSS для красивого эффекта при наведении на карточки -->
+<style>
+    .hover-shadow {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>

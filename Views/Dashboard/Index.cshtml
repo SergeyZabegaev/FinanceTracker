@@ -1,0 +1,174 @@
+﻿@{
+    ViewData["Title"] = "Дашборд";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📈 Дашборд</h2>
+        <a asp-controller="Transactions" asp-action="Index" class="btn btn-outline-secondary">
+            ← К операциям
+        </a>
+    </div>
+
+    <!-- График 1: динамика по месяцам -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Доходы и расходы по месяцам (последние 12 месяцев)</strong>
+        </div>
+        <div class="card-body">
+            <canvas id="monthlyChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- График 2: структура расходов -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <strong>Структура расходов по категориям</strong>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- График 3: топ-5 категорий -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <strong>Топ-5 категорий расходов</strong>
+                </div>
+                <div class="card-body">
+                    <canvas id="topChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js через CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Утилита: форматирование числа как рубли
+        function formatRub(value) {
+            return new Intl.NumberFormat('ru-RU', {
+                style: 'currency', currency: 'RUB', maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        // ---------- График 1: динамика по месяцам ----------
+        fetch('@Url.Action("GetMonthlyData", "Dashboard")')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('monthlyChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Доходы',
+                                data: data.incomes,
+                                borderColor: '#198754',
+                                backgroundColor: 'rgba(25,135,84,0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Расходы',
+                                data: data.expenses,
+                                borderColor: '#dc3545',
+                                backgroundColor: 'rgba(220,53,69,0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `${ctx.dataset.label}: ${formatRub(ctx.parsed.y)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: v => formatRub(v) }
+                            }
+                        }
+                    }
+                });
+            });
+
+        // ---------- График 2: структура расходов (donut) ----------
+        fetch('@Url.Action("GetExpensesByCategory", "Dashboard")')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('categoryChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.values,
+                            backgroundColor: [
+                                '#0d6efd', '#6610f2', '#d63384', '#fd7e14',
+                                '#198754', '#20c997', '#ffc107', '#6c757d',
+                                '#dc3545', '#0dcaf0'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `${ctx.label}: ${formatRub(ctx.parsed)}`
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+        // ---------- График 3: топ-5 категорий (bar) ----------
+        fetch('@Url.Action("GetTopExpenseCategories", "Dashboard")')
+            .then(r => r.json())
+            .then(data => {
+                new Chart(document.getElementById('topChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Сумма расходов',
+                            data: data.values,
+                            backgroundColor: '#dc3545'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => formatRub(ctx.parsed.y)
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: v => formatRub(v) }
+                            }
+                        }
+                    }
+                });
+            });
+    </script>
+}

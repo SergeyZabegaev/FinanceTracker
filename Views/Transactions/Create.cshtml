@@ -1,0 +1,83 @@
+﻿@model FinanceTracker.Models.Transaction
+@{
+    ViewData["Title"] = "Добавить операцию";
+}
+
+<div class="container mt-4">
+    <h2>Добавить новую операцию</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Type" class="form-label"></label>
+                    <select asp-for="Type" class="form-select" id="typeSelect">
+                        <option value="Income">Доход</option>
+                        <option value="Expense" selected>Расход</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryId" class="form-label"></label>
+                    <select asp-for="CategoryId" class="form-select" id="categorySelect">
+                        <!-- Заполняется через JS или можно оставить как есть, но лучше отфильтровать -->
+                        @foreach (var cat in (IEnumerable<FinanceTracker.Models.Category>)ViewBag.Categories)
+                        {
+                            <option value="@cat.Id" data-type="@cat.Type">@cat.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Amount" class="form-label"></label>
+                    <input asp-for="Amount" class="form-control" step="0.01" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Date" class="form-label"></label>
+                    <input asp-for="Date" class="form-control" type="date" />
+                    <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Простой скрипт для фильтрации категорий в зависимости от выбранного типа
+        document.getElementById('typeSelect').addEventListener('change', function() {
+            var selectedType = this.value;
+            var options = document.getElementById('categorySelect').options;
+            for (var i = 0; i < options.length; i++) {
+                options[i].style.display = (options[i].getAttribute('data-type') === selectedType) ? 'block' : 'none';
+            }
+            // Выбрать первый видимый элемент
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].style.display !== 'none') {
+                    document.getElementById('categorySelect').selectedIndex = i;
+                    break;
+                }
+            }
+        });
+        // Инициализация при загрузке
+        document.getElementById('typeSelect').dispatchEvent(new Event('change'));
+    </script>
+}
